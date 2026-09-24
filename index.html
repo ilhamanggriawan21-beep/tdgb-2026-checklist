@@ -7,7 +7,7 @@
   
   <!-- SheetJS Offline Engine -->
   <script src="assets/xlsx.full.min.js"></script>
-  <!-- Supabase JS Client (CDN with offline tolerance) -->
+  <!-- Supabase JS Client -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <!-- Supabase Config File -->
   <script src="supabase_config.js"></script>
@@ -101,37 +101,38 @@
     .brand-group {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
     }
 
     .brand-name {
-      font-size: 1.1rem;
+      font-size: 1.05rem;
       font-weight: 900;
-      letter-spacing: -0.6px;
+      letter-spacing: -0.5px;
       color: var(--black);
     }
 
     .brand-badge {
-      font-size: 0.65rem;
+      font-size: 0.62rem;
       font-weight: 800;
       font-family: var(--font-mono);
       background: var(--black);
       color: var(--white);
-      padding: 2px 6px;
+      padding: 2px 5px;
       border-radius: var(--radius-sm);
     }
 
     .sync-indicator {
-      font-size: 0.65rem;
+      font-size: 0.62rem;
       font-weight: 800;
       font-family: var(--font-mono);
       border: 1px solid var(--black);
       padding: 2px 6px;
       border-radius: var(--radius-sm);
       cursor: pointer;
-      display: flex;
+      display: inline-flex;
       align-items: center;
       gap: 4px;
+      user-select: none;
     }
 
     .sync-indicator.online {
@@ -144,10 +145,15 @@
       color: var(--black);
     }
 
+    .sync-indicator.syncing {
+      background: var(--gray-200);
+      color: var(--black);
+    }
+
     .top-actions {
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 4px;
     }
 
     /* Button System */
@@ -155,10 +161,10 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 6px;
+      gap: 5px;
       font-size: 0.8125rem;
       font-weight: 700;
-      padding: 7px 12px;
+      padding: 6px 10px;
       border-radius: var(--radius-md);
       border: 1.5px solid var(--black);
       background: var(--white);
@@ -194,8 +200,8 @@
     }
 
     .btn-icon-sq {
-      width: 38px;
-      height: 38px;
+      width: 36px;
+      height: 36px;
       padding: 0;
       border-radius: var(--radius-md);
     }
@@ -764,11 +770,15 @@
       <div class="brand-group">
         <span class="brand-name">TDGB 2026</span>
         <span class="brand-badge">CHECKLIST</span>
-        <span class="sync-indicator offline" id="syncStatusBadge" onclick="openSupabaseModal()" title="Status Koneksi Cloud">
-          ● LOKAL
+        <span class="sync-indicator offline" id="syncStatusBadge" onclick="openSupabaseModal()" title="Status Koneksi Cloud (Klik untuk Pengaturan)">
+          ● CLOUD
         </span>
       </div>
       <div class="top-actions">
+        <!-- Tombol Sync Manual Cepat -->
+        <button class="btn btn-ghost btn-sm" onclick="forceSync()" title="Sinkronkan Sekarang" style="padding: 6px;">
+          <svg class="icon icon-sm" id="syncIconRotate" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+        </button>
         <button class="btn btn-sm" onclick="exportToExcel()" title="Unduh Excel">
           <svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
           <span>Excel</span>
@@ -788,7 +798,7 @@
       <div class="kpi-item active" id="kpi-card-kirim" onclick="setMainTab('kirim')">
         <div class="kpi-label">
           <span>Dikirim</span>
-          <svg class="icon icon-sm" viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+          <svg class="icon icon-sm" viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
         </div>
         <div class="kpi-val" id="kpi-kirim-num">0</div>
         <div class="kpi-meta-text">
@@ -981,7 +991,7 @@
 
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 16px;">
         <button class="btn" onclick="closeEditModal()">Batal</button>
-        <button class="btn btn-solid" onclick="saveEditModal()">Simpan</button>
+        <button class="btn btn-solid" onclick="saveEditModal()">Simpan ke Cloud</button>
       </div>
     </div>
   </div>
@@ -997,7 +1007,7 @@
       </div>
 
       <div style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 12px; line-height: 1.4;">
-        Hubungkan ke database Supabase agar semua perangkat (Laptop, HP panitia) dapat saling sinkron secara realtime dari mana saja!
+        Koneksi ini menghubungkan semua perangkat (Laptop, HP panitia) ke database Supabase yang sama secara realtime.
       </div>
 
       <div class="input-group">
@@ -1028,11 +1038,19 @@
       </div>
 
       <div style="display: flex; flex-direction: column; gap: 8px;">
+        <button class="btn" style="justify-content: flex-start; padding: 10px;" onclick="forceSync(); closeMenuModal();">
+          <svg class="icon icon-sm" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+          <div style="text-align: left; margin-left: 6px;">
+            <div style="font-weight: 800;">Sinkronkan Data Sekarang</div>
+            <div style="font-size: 0.7rem; color: var(--text-muted);">Paksa perbarui data terbaru dari Cloud Supabase</div>
+          </div>
+        </button>
+
         <button class="btn" style="justify-content: flex-start; padding: 10px;" onclick="closeMenuModal(); openSupabaseModal();">
           <svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/></svg>
           <div style="text-align: left; margin-left: 6px;">
-            <div style="font-weight: 800;">Koneksi Supabase Cloud</div>
-            <div style="font-size: 0.7rem; color: var(--text-muted);">Sinkronisasi realtime lintas banyak perangkat</div>
+            <div style="font-weight: 800;">Pengaturan Kredensial Supabase</div>
+            <div style="font-size: 0.7rem; color: var(--text-muted);">Cek URL & Key database cloud</div>
           </div>
         </button>
 
@@ -1069,6 +1087,17 @@
     let searchQuery = '';
     let selectedIds = new Set();
     let supabaseClient = null;
+    let realtimeChannel = null;
+    let isFetchingFromCloud = false;
+
+    // Helper: Sort list by numeric ID P-1, P-2, ... P-321
+    function sortParticipants(list) {
+      return list.sort((a, b) => {
+        const numA = parseInt((a.id || '').replace(/[^0-9]/g, ''), 10) || 0;
+        const numB = parseInt((b.id || '').replace(/[^0-9]/g, ''), 10) || 0;
+        return numA - numB;
+      });
+    }
 
     // Inisialisasi Supabase
     function initSupabase() {
@@ -1077,145 +1106,247 @@
 
       if (storedUrl && storedKey && typeof window.supabase !== 'undefined') {
         try {
-          supabaseClient = window.supabase.createClient(storedUrl, storedKey);
-          updateSyncBadge(true);
+          supabaseClient = window.supabase.createClient(storedUrl, storedKey, {
+            auth: { persistSession: false }
+          });
+          updateSyncBadge('online');
           setupRealtimeSubscription();
           return true;
         } catch (e) {
           console.error('Inisialisasi Supabase gagal:', e);
-          updateSyncBadge(false);
+          updateSyncBadge('offline');
           return false;
         }
       }
-      updateSyncBadge(false);
+      updateSyncBadge('offline');
       return false;
     }
 
-    function updateSyncBadge(isCloud) {
+    function updateSyncBadge(state) {
       const el = document.getElementById('syncStatusBadge');
-      if (isCloud) {
+      if (!el) return;
+      if (state === 'online') {
         el.className = 'sync-indicator online';
-        el.innerText = '● CLOUD REALTIME';
+        el.innerText = '● CLOUD SYNC';
+      } else if (state === 'syncing') {
+        el.className = 'sync-indicator syncing';
+        el.innerText = '⟳ SYNCING...';
       } else {
         el.className = 'sync-indicator offline';
-        el.innerText = '○ LOKAL (KLIK SYNC)';
+        el.innerText = '○ OFFLINE (SETTING)';
       }
     }
 
-    // Subscribe ke Realtime Supabase
+    // Subscribe ke Realtime Supabase (WebSocket)
     function setupRealtimeSubscription() {
       if (!supabaseClient) return;
 
-      supabaseClient
-        .channel('public:peserta')
+      if (realtimeChannel) {
+        supabaseClient.removeChannel(realtimeChannel);
+      }
+
+      realtimeChannel = supabaseClient
+        .channel('public-peserta-realtime')
         .on('postgres_changes', { event: '*', schema: 'public', table: 'peserta' }, payload => {
-          if (payload.eventType === 'UPDATE') {
+          console.log('[Supabase Realtime] Event diterima:', payload);
+          if (payload.eventType === 'UPDATE' && payload.new) {
             const updated = payload.new;
             const idx = participants.findIndex(p => p.id === updated.id);
             if (idx !== -1) {
               participants[idx].statusKirim = updated.status_kirim;
-              participants[idx].ekspedisi = updated.ekspedisi;
-              participants[idx].noResi = updated.no_resi;
-              participants[idx].tanggalKirim = updated.tanggal_kirim;
-              participants[idx].catatan = updated.catatan;
+              participants[idx].ekspedisi = updated.ekspedisi || '';
+              participants[idx].noResi = updated.no_resi || '';
+              participants[idx].tanggalKirim = updated.tanggal_kirim || '';
+              participants[idx].catatan = updated.catatan || '';
               localStorage.setItem(STORAGE_KEY, JSON.stringify(participants));
               updateStats();
               renderCards();
-              showToast(`Data ${updated.nama} diperbarui realtime`);
+              showToast(`${updated.nama} diperbarui dari device lain`);
+            } else {
+              loadDataSilently();
             }
+          } else {
+            loadDataSilently();
           }
         })
-        .subscribe();
+        .subscribe(status => {
+          console.log('[Supabase Realtime] Status channel:', status);
+          if (status === 'SUBSCRIBED') {
+            updateSyncBadge('online');
+          }
+        });
     }
 
-    // Load Data
+    // Load Data Utama
     async function loadData() {
       const isCloudReady = initSupabase();
 
-      // Coba load dari Supabase jika terhubung
       if (isCloudReady) {
+        updateSyncBadge('syncing');
         try {
-          const { data, error } = await supabaseClient.from('peserta').select('*');
+          // Ambil seluruh data dari Supabase
+          const { data, error } = await supabaseClient
+            .from('peserta')
+            .select('*')
+            .order('id', { ascending: true });
+
           if (!error && data && data.length > 0) {
-            participants = data.map(d => ({
-              id: d.id,
-              bib: d.bib,
-              noReg: d.no_reg,
-              nama: d.nama,
-              komunitas: d.komunitas,
-              noTelp: d.no_telp,
-              noKerabat: d.no_kerabat,
-              alamatLengkap: d.alamat_lengkap,
-              jenisReg: d.jenis_reg,
-              isPO: d.is_po,
-              kategoriJersey: d.kategori_jersey,
-              jenisLengan: d.jenis_lengan,
-              ukuran: d.ukuran,
-              qty: d.qty,
-              metodeAmbil: d.metode_ambil,
-              alamatKirim: d.alamat_kirim,
-              batchProduksi: d.batch_produksi,
-              totalHarga: d.total_harga,
-              statusPembayaran: d.status_pembayaran,
-              isLunas: d.is_lunas,
-              verifikator: d.verifikator,
-              tanggalBayar: d.tanggal_bayar,
-              statusKirim: d.status_kirim || 'Belum',
-              ekspedisi: d.ekspedisi || '',
-              noResi: d.no_resi || '',
-              tanggalKirim: d.tanggal_kirim || '',
-              catatan: d.catatan || ''
-            }));
+            participants = sortParticipants(data.map(mapSupabaseRow));
             localStorage.setItem(STORAGE_KEY, JSON.stringify(participants));
             updateStats();
             renderCards();
+            updateSyncBadge('online');
             return;
+          } else if (error) {
+            console.error('Fetch Supabase error:', error);
           }
         } catch (err) {
-          console.warn('Fetch Supabase error:', err);
+          console.warn('Fetch Supabase network error:', err);
         }
       }
 
-      // Fallback ke LocalStorage / INITIAL_DATA
+      // Fallback ke LocalStorage / INITIAL_DATA jika Supabase belum siap
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) {
         try {
-          participants = JSON.parse(saved);
+          participants = sortParticipants(JSON.parse(saved));
         } catch (e) {
-          participants = JSON.parse(JSON.stringify(window.INITIAL_DATA || []));
+          participants = sortParticipants(JSON.parse(JSON.stringify(window.INITIAL_DATA || [])));
         }
       } else if (window.INITIAL_DATA) {
-        participants = JSON.parse(JSON.stringify(window.INITIAL_DATA));
+        participants = sortParticipants(JSON.parse(JSON.stringify(window.INITIAL_DATA)));
       } else {
         participants = [];
       }
       updateStats();
       renderCards();
+      updateSyncBadge(isCloudReady ? 'online' : 'offline');
     }
 
-    // Save Data (Local + Cloud Sync)
+    // Silent Background Poller: Cek perubahan data dari Supabase tanpa mengganggu UI
+    async function loadDataSilently() {
+      if (!supabaseClient || isFetchingFromCloud) return;
+      isFetchingFromCloud = true;
+
+      try {
+        const { data, error } = await supabaseClient
+          .from('peserta')
+          .select('id, status_kirim, ekspedisi, no_resi, tanggal_kirim, catatan')
+          .order('id', { ascending: true });
+
+        if (!error && data && data.length > 0) {
+          let hasDiff = false;
+          data.forEach(row => {
+            const item = participants.find(p => p.id === row.id);
+            if (item) {
+              if (item.statusKirim !== row.status_kirim ||
+                  item.noResi !== (row.no_resi || '') ||
+                  item.ekspedisi !== (row.ekspedisi || '') ||
+                  item.tanggalKirim !== (row.tanggal_kirim || '') ||
+                  item.catatan !== (row.catatan || '')) {
+                
+                item.statusKirim = row.status_kirim;
+                item.ekspedisi = row.ekspedisi || '';
+                item.noResi = row.no_resi || '';
+                item.tanggalKirim = row.tanggal_kirim || '';
+                item.catatan = row.catatan || '';
+                hasDiff = true;
+              }
+            }
+          });
+
+          if (hasDiff) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(participants));
+            updateStats();
+            renderCards();
+            showToast('Data otomatis tersinkronisasi');
+          }
+        }
+      } catch (e) {
+        console.warn('Silent sync error:', e);
+      } finally {
+        isFetchingFromCloud = false;
+      }
+    }
+
+    // Manual Force Sync Button (Tap ikon refresh di header)
+    async function forceSync() {
+      const syncIcon = document.getElementById('syncIconRotate');
+      if (syncIcon) syncIcon.style.animation = 'spin 0.6s linear infinite';
+      showToast('Menghubungkan ke Cloud...');
+      await loadData();
+      if (syncIcon) syncIcon.style.animation = 'none';
+      showToast('Data sinkron 100%');
+    }
+
+    function mapSupabaseRow(d) {
+      return {
+        id: d.id,
+        bib: d.bib,
+        noReg: d.no_reg,
+        nama: d.nama,
+        komunitas: d.komunitas,
+        noTelp: d.no_telp,
+        noKerabat: d.no_kerabat,
+        alamatLengkap: d.alamat_lengkap,
+        jenisReg: d.jenis_reg,
+        isPO: d.is_po,
+        kategoriJersey: d.kategori_jersey,
+        jenisLengan: d.jenis_lengan,
+        ukuran: d.ukuran,
+        qty: d.qty,
+        metodeAmbil: d.metode_ambil,
+        alamatKirim: d.alamat_kirim,
+        batchProduksi: d.batch_produksi,
+        totalHarga: d.total_harga,
+        statusPembayaran: d.status_pembayaran,
+        isLunas: d.is_lunas,
+        verifikator: d.verifikator,
+        tanggalBayar: d.tanggal_bayar,
+        statusKirim: d.status_kirim || 'Belum',
+        ekspedisi: d.ekspedisi || '',
+        noResi: d.no_resi || '',
+        tanggalKirim: d.tanggal_kirim || '',
+        catatan: d.catatan || ''
+      };
+    }
+
+    // Save Data (Local Cache + Immediate Supabase Cloud Push)
     async function saveData(singleItem = null) {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(participants));
       updateStats();
-      showToast('Tersimpan');
 
-      // Jika ada koneksi Supabase, sync update
-      if (supabaseClient) {
+      if (supabaseClient && singleItem) {
+        updateSyncBadge('syncing');
         try {
-          if (singleItem) {
-            await supabaseClient.from('peserta').update({
-              status_kirim: singleItem.statusKirim,
-              ekspedisi: singleItem.ekspedisi,
-              no_resi: singleItem.noResi,
-              tanggal_kirim: singleItem.tanggalKirim,
-              catatan: singleItem.catatan
-            }).eq('id', singleItem.id);
+          const payload = {
+            status_kirim: singleItem.statusKirim,
+            ekspedisi: singleItem.ekspedisi || '',
+            no_resi: singleItem.noResi || '',
+            tanggal_kirim: singleItem.tanggalKirim || '',
+            catatan: singleItem.catatan || '',
+            updated_at: new Date().toISOString()
+          };
+
+          const { error } = await supabaseClient
+            .from('peserta')
+            .update(payload)
+            .eq('id', singleItem.id);
+
+          if (error) {
+            console.error('Supabase update error:', error);
+            showToast('Gagal simpan ke Cloud: ' + error.message);
+            updateSyncBadge('offline');
           } else {
-            // Bulk update payload jika ada
+            showToast('Tersimpan ke Cloud');
+            updateSyncBadge('online');
           }
         } catch (e) {
-          console.error('Gagal update ke Supabase:', e);
+          console.error('Network error ke Supabase:', e);
+          showToast('Tersimpan lokal (Offline)');
         }
+      } else {
+        showToast('Tersimpan secara lokal');
       }
     }
 
@@ -1478,17 +1609,15 @@
 
       if (item.statusKirim === 'Sudah') {
         item.statusKirim = 'Belum';
-        showToast('Ditandai Belum');
       } else {
         item.statusKirim = 'Sudah';
         if (!item.tanggalKirim) {
           item.tanggalKirim = new Date().toISOString().split('T')[0];
         }
-        showToast('Ditandai Selesai');
       }
 
-      saveData(item);
       renderCards();
+      saveData(item);
     }
 
     // Selection Handlers
@@ -1518,27 +1647,32 @@
       }
     }
 
-    function bulkMarkDone() {
+    async function bulkMarkDone() {
       const today = new Date().toISOString().split('T')[0];
-      let count = 0;
+      const selectedList = [];
+
       participants.forEach(p => {
         if (selectedIds.has(p.id) && p.isPO) {
           p.statusKirim = 'Sudah';
           if (!p.tanggalKirim) p.tanggalKirim = today;
-          count++;
-          if (supabaseClient) {
-            supabaseClient.from('peserta').update({
-              status_kirim: 'Sudah',
-              tanggal_kirim: today
-            }).eq('id', p.id);
-          }
+          selectedList.push(p);
         }
       });
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(participants));
-      updateStats();
+
       renderCards();
       clearSelection();
-      showToast(`${count} peserta ditandai selesai`);
+      showToast(`${selectedList.length} peserta ditandai selesai`);
+
+      // Push bulk ke Supabase
+      if (supabaseClient && selectedList.length > 0) {
+        for (const item of selectedList) {
+          await supabaseClient.from('peserta').update({
+            status_kirim: 'Sudah',
+            tanggal_kirim: today
+          }).eq('id', item.id);
+        }
+        showToast('Sinkron ke Cloud selesai');
+      }
     }
 
     // Edit Modal
@@ -1586,9 +1720,9 @@
       item.tanggalKirim = document.getElementById('modalTanggalKirim').value;
       item.catatan = document.getElementById('modalCatatan').value.trim();
 
-      saveData(item);
-      closeEditModal();
       renderCards();
+      closeEditModal();
+      saveData(item);
     }
 
     // Print Thermal Labels
@@ -1714,7 +1848,7 @@
     function resetToInitial() {
       if (confirm('Kembalikan semua status checklist ke awal?')) {
         localStorage.removeItem(STORAGE_KEY);
-        participants = JSON.parse(JSON.stringify(window.INITIAL_DATA || []));
+        participants = sortParticipants(JSON.parse(JSON.stringify(window.INITIAL_DATA || [])));
         saveData();
         renderCards();
         closeMenuModal();
@@ -1727,7 +1861,7 @@
       toast.classList.add('show');
       setTimeout(() => {
         toast.classList.remove('show');
-      }, 1800);
+      }, 2000);
     }
 
     function escapeHtml(str) {
@@ -1740,8 +1874,21 @@
         .replace(/'/g, "&#039;");
     }
 
+    // CSS Keyframe Animation Helper
+    const styleEl = document.createElement('style');
+    styleEl.innerHTML = `@keyframes spin { 100% { transform: rotate(360deg); } }`;
+    document.head.appendChild(styleEl);
+
+    // Initial Start
     window.addEventListener('DOMContentLoaded', () => {
       loadData();
+
+      // Silent Auto-Poller: setiap 4 detik memperbarui data dari Supabase jika tab sedang aktif
+      setInterval(() => {
+        if (document.visibilityState === 'visible') {
+          loadDataSilently();
+        }
+      }, 4000);
     });
   </script>
 </body>
