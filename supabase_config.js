@@ -1,7 +1,5 @@
-// Konfigurasi Supabase Project Anda
-// Ganti dengan Project URL dan Anon Key dari dashboard Supabase Anda:
-// https://app.supabase.com -> Project Settings -> API
+// Konfigurasi Supabase Project Tour De Gunung Batu 2026
 window.SUPABASE_CONFIG = {
-  url: '',      // Contoh: 'https://xyzcompany.supabase.co'
-  anonKey: ''  // Contoh: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'
+  url: 'https://rqygfygungsnefqfxwfe.supabase.co',
+  anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJxeWdmeWd1bmdzbmVmcWZ4d2ZlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAyNTAxOTEsImV4cCI6MjEwNTgyNjE5MX0.7jQudEq-4dBpsCStkvj6GrZemRk4paOEmvcIva82Jho'
 };
