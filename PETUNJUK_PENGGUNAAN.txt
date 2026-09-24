@@ -1,0 +1,44 @@
+========================================================================
+    SISTEM CHECKLIST PO JERSEY — TOUR DE GUNUNG BATU 2026
+    Tema: Ultra-Minimalist Monochrome (Hitam & Putih) — Mobile First
+========================================================================
+
+Halo! Sistem ini telah dirombak total dengan desain modern monokrom (hitam & putih)
+yang sangat rapi, bersih, tanpa ikon template/emoji berlebihan, dan dioptimasi
+khusus untuk penggunaan di Smartphone / Layar HP (Mobile-First Responsive).
+
+------------------------------------------------------------------------
+CARA PENGGUNAAN:
+------------------------------------------------------------------------
+
+1. BUKA DI LAPTOP / KOMPUTER:
+   - Cukup klik ganda (double-click) file:
+     "Buka_Sistem_Checklist.bat"
+   - Aplikasi langsung terbuka di browser Anda secara OFFLINE.
+
+2. BUKA DI HP / SMARTPHONE (REALTIME SYNC VIA WI-FI):
+   - Sambungkan laptop dan HP Anda ke jaringan Wi-Fi yang sama (atau hotspot HP).
+   - Di laptop, klik ganda file:
+     "Jalankan_Server_LAN.bat"
+   - Jendela terminal akan menampilkan alamat IP, contoh:
+     http://192.168.1.15:3000
+   - Buka Chrome atau Safari di HP Anda, lalu ketik alamat tersebut.
+   - Selesai! Anda bisa langsung mencentang, mengisi resi, dan memproses data dari HP.
+   - Setiap checklist yang dilakukan di HP akan otomatis tersimpan langsung
+     ke laptop secara realtime!
+
+------------------------------------------------------------------------
+FITUR-FITUR DI TAMPILAN HP:
+------------------------------------------------------------------------
+- KARTU MONOKROM RINGKAS: Setiap peserta ditampilkan dalam kartu rapi dengan
+  nomor BIB, Nama, Komunitas, Ukuran Jersey, Alamat, dan Status Pengiriman.
+- CHECKLIST 1-TAP: Cukup tap tombol "TANDAI DIKIRIM" / "SUDAH DIKIRIM" dengan jempol.
+- CHAT WHATSAPP OTOMATIS: Tap ikon chat untuk langsung membuka WhatsApp ke nomor peserta
+  dengan format pesan konfirmasi resi yang rapi dan profesional.
+- UPDATE RESI & KURIR: Tap ikon pensil untuk mengisi kurir (JNE, J&T, SiCepat, dll),
+  nomor resi, dan tanggal kirim.
+- CETAK STIKER PENGIRIMAN: Desain label siap cetak monokrom resolusi tinggi
+  untuk ditempel pada paket jersey.
+- EKSPOR EXCEL TERUPDATE: Tombol "Excel" di pojok kanan atas untuk mengunduh
+  rekap terbaru kapan saja.
+========================================================================

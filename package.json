@@ -1,0 +1,13 @@
+{
+  "name": "checklist-po-jersey-tdgb2026",
+  "version": "1.0.0",
+  "description": "Sistem Checklist PO Jersey Tour De Gunung Batu 2026 Mobile First",
+  "main": "index.html",
+  "scripts": {
+    "start": "node server.js",
+    "upload:supabase": "node upload_to_supabase.js"
+  },
+  "keywords": ["checklist", "jersey", "tdgb2026", "logistics"],
+  "author": "Panitia TDGB 2026",
+  "license": "MIT"
+}

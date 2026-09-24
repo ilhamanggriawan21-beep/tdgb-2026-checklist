@@ -1,0 +1,1748 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Checklist PO Jersey — TDGB 2026</title>
+  
+  <!-- SheetJS Offline Engine -->
+  <script src="assets/xlsx.full.min.js"></script>
+  <!-- Supabase JS Client (CDN with offline tolerance) -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- Supabase Config File -->
+  <script src="supabase_config.js"></script>
+  <!-- Initial Dataset Fallback -->
+  <script src="data/peserta_data.js"></script>
+
+  <style>
+    /* -------------------------------------------------------------
+       DESIGN SYSTEM: ULTRA-MINIMAL MONOCHROME (BLACK & WHITE)
+       Mobile-first, high contrast, typography-driven, zero distractions
+    ------------------------------------------------------------- */
+    :root {
+      --bg: #ffffff;
+      --bg-subtle: #f9f9fb;
+      --surface: #ffffff;
+      --border: #e8e8ed;
+      --border-dark: #000000;
+      
+      --text-main: #000000;
+      --text-muted: #555555;
+      --text-subtle: #888888;
+      
+      --black: #000000;
+      --white: #ffffff;
+      --gray-100: #f4f4f6;
+      --gray-200: #e5e5ea;
+      --gray-300: #d1d1d6;
+      --gray-400: #8e8e93;
+
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 14px;
+      --radius-full: 9999px;
+
+      --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+      --font-mono: "SF Mono", "JetBrains Mono", Consolas, Menlo, monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: var(--bg-subtle);
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      -webkit-font-smoothing: antialiased;
+      line-height: 1.4;
+      padding-bottom: 90px;
+    }
+
+    /* Minimalist Inline SVG Icons */
+    .icon {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      stroke-width: 2;
+      stroke: currentColor;
+      fill: none;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      vertical-align: middle;
+      flex-shrink: 0;
+    }
+    .icon-sm { width: 14px; height: 14px; }
+    .icon-lg { width: 22px; height: 22px; }
+
+    /* Sticky Top Header */
+    .top-bar {
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 60;
+      backdrop-filter: blur(10px);
+      background-color: rgba(255, 255, 255, 0.96);
+    }
+
+    .top-bar-inner {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .brand-name {
+      font-size: 1.1rem;
+      font-weight: 900;
+      letter-spacing: -0.6px;
+      color: var(--black);
+    }
+
+    .brand-badge {
+      font-size: 0.65rem;
+      font-weight: 800;
+      font-family: var(--font-mono);
+      background: var(--black);
+      color: var(--white);
+      padding: 2px 6px;
+      border-radius: var(--radius-sm);
+    }
+
+    .sync-indicator {
+      font-size: 0.65rem;
+      font-weight: 800;
+      font-family: var(--font-mono);
+      border: 1px solid var(--black);
+      padding: 2px 6px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .sync-indicator.online {
+      background: var(--black);
+      color: var(--white);
+    }
+
+    .sync-indicator.offline {
+      background: var(--white);
+      color: var(--black);
+    }
+
+    .top-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* Button System */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      font-size: 0.8125rem;
+      font-weight: 700;
+      padding: 7px 12px;
+      border-radius: var(--radius-md);
+      border: 1.5px solid var(--black);
+      background: var(--white);
+      color: var(--black);
+      cursor: pointer;
+      transition: transform 0.1s ease, background 0.15s ease;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .btn:active {
+      transform: scale(0.96);
+    }
+
+    .btn-solid {
+      background: var(--black);
+      color: var(--white);
+    }
+
+    .btn-solid:hover {
+      background: #1c1c1e;
+    }
+
+    .btn-ghost {
+      border-color: transparent;
+      background: transparent;
+      color: var(--text-muted);
+    }
+
+    .btn-ghost:hover {
+      background: var(--gray-100);
+      color: var(--black);
+    }
+
+    .btn-icon-sq {
+      width: 38px;
+      height: 38px;
+      padding: 0;
+      border-radius: var(--radius-md);
+    }
+
+    /* Layout Container */
+    .app-container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 12px 16px;
+    }
+
+    /* KPI Summary Row */
+    .kpi-row {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      padding-bottom: 4px;
+      margin-bottom: 12px;
+    }
+    .kpi-row::-webkit-scrollbar { display: none; }
+
+    .kpi-item {
+      flex: 0 0 145px;
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 10px 12px;
+      cursor: pointer;
+      user-select: none;
+      transition: all 0.15s ease;
+    }
+
+    @media (min-width: 600px) {
+      .kpi-item { flex: 1; }
+    }
+
+    .kpi-item.active {
+      border: 2px solid var(--black);
+      background: var(--gray-100);
+    }
+
+    .kpi-label {
+      font-size: 0.68rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: var(--text-muted);
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 2px;
+    }
+
+    .kpi-val {
+      font-size: 1.5rem;
+      font-weight: 900;
+      letter-spacing: -0.6px;
+      line-height: 1.1;
+    }
+
+    .kpi-meta-text {
+      font-size: 0.7rem;
+      color: var(--text-subtle);
+      margin-top: 4px;
+      display: flex;
+      justify-content: space-between;
+      font-family: var(--font-mono);
+      font-weight: 600;
+    }
+
+    /* Segmented Navigation */
+    .segment-bar {
+      background: var(--gray-200);
+      padding: 3px;
+      border-radius: var(--radius-md);
+      display: flex;
+      gap: 3px;
+      margin-bottom: 12px;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .segment-bar::-webkit-scrollbar { display: none; }
+
+    .segment-btn {
+      flex: 1;
+      min-width: 85px;
+      padding: 8px 6px;
+      border-radius: var(--radius-sm);
+      border: none;
+      background: transparent;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      white-space: nowrap;
+      transition: all 0.15s ease;
+    }
+
+    .segment-btn.active {
+      background: var(--white);
+      color: var(--black);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .segment-counter {
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      background: var(--gray-100);
+      color: var(--black);
+      padding: 1px 5px;
+      border-radius: var(--radius-full);
+      border: 1px solid var(--gray-300);
+    }
+
+    .segment-btn.active .segment-counter {
+      background: var(--black);
+      color: var(--white);
+      border-color: var(--black);
+    }
+
+    /* Sticky Search & Filter Box */
+    .filter-panel {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 8px 10px;
+      margin-bottom: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .search-box {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .search-icon-pos {
+      position: absolute;
+      left: 10px;
+      color: var(--text-subtle);
+      pointer-events: none;
+    }
+
+    .search-input {
+      width: 100%;
+      height: 38px;
+      padding: 0 10px 0 34px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--bg-subtle);
+      color: var(--black);
+      outline: none;
+    }
+
+    .search-input:focus {
+      border-color: var(--black);
+      background: var(--white);
+    }
+
+    .filter-chip-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      padding-bottom: 2px;
+    }
+    .filter-chip-row::-webkit-scrollbar { display: none; }
+
+    .chip-btn {
+      padding: 4px 10px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      border-radius: var(--radius-full);
+      border: 1px solid var(--border);
+      background: var(--bg-subtle);
+      color: var(--text-muted);
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .chip-btn.active {
+      border-color: var(--black);
+      background: var(--black);
+      color: var(--white);
+    }
+
+    .chip-select {
+      height: 28px;
+      padding: 0 8px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      border-radius: var(--radius-full);
+      border: 1px solid var(--border);
+      background: var(--bg-subtle);
+      color: var(--black);
+      outline: none;
+      cursor: pointer;
+    }
+
+    /* CARD LIST (Modern Monochrome Cards) */
+    .card-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .participant-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 12px 14px;
+      transition: border-color 0.15s ease;
+    }
+
+    .participant-card.done {
+      border-left: 4px solid var(--black);
+    }
+
+    .participant-card.unpaid {
+      border-left: 4px solid var(--gray-400);
+      background: #fafafb;
+    }
+
+    .card-header-line {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .bib-badge {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 900;
+      background: var(--black);
+      color: var(--white);
+      padding: 2px 6px;
+      border-radius: var(--radius-sm);
+    }
+
+    .reg-badge {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+      padding: 2px 5px;
+      border-radius: var(--radius-sm);
+    }
+
+    .batch-badge {
+      font-size: 0.65rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      border: 1px solid var(--border);
+      padding: 1px 5px;
+      border-radius: var(--radius-sm);
+      color: var(--text-subtle);
+    }
+
+    .unpaid-tag {
+      font-size: 0.65rem;
+      font-weight: 800;
+      border: 1px solid var(--black);
+      padding: 1px 6px;
+      border-radius: var(--radius-sm);
+    }
+
+    .card-name-title {
+      font-size: 0.95rem;
+      font-weight: 800;
+      letter-spacing: -0.3px;
+      color: var(--black);
+    }
+
+    .card-sub-meta {
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-top: 1px;
+    }
+
+    /* Jersey Specs Block */
+    .jersey-spec-row {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin: 8px 0;
+      padding: 6px 8px;
+      background: var(--bg-subtle);
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+    }
+
+    .size-box {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      font-weight: 900;
+      background: var(--black);
+      color: var(--white);
+      padding: 2px 7px;
+      border-radius: var(--radius-sm);
+    }
+
+    .spec-desc {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--black);
+    }
+
+    .method-pill {
+      margin-left: auto;
+      font-size: 0.68rem;
+      font-weight: 800;
+      letter-spacing: 0.4px;
+      border: 1px solid var(--black);
+      padding: 1px 5px;
+      border-radius: var(--radius-sm);
+    }
+
+    /* Address & Resi */
+    .address-text {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      line-height: 1.35;
+      margin-bottom: 8px;
+    }
+
+    .resi-strip {
+      background: var(--gray-100);
+      border: 1px dashed var(--gray-300);
+      border-radius: var(--radius-sm);
+      padding: 6px 10px;
+      margin-bottom: 10px;
+      font-size: 0.75rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .resi-code {
+      font-family: var(--font-mono);
+      font-weight: 800;
+      color: var(--black);
+    }
+
+    /* Card Controls */
+    .card-actions-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding-top: 8px;
+      border-top: 1px solid var(--border);
+    }
+
+    .status-toggle-thumb {
+      flex: 1;
+      height: 38px;
+      border-radius: var(--radius-md);
+      font-size: 0.75rem;
+      font-weight: 800;
+      letter-spacing: 0.3px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      cursor: pointer;
+      user-select: none;
+      transition: all 0.15s ease;
+    }
+
+    .toggle-done {
+      background: var(--black);
+      color: var(--white);
+      border: 1px solid var(--black);
+    }
+
+    .toggle-not-done {
+      background: var(--white);
+      color: var(--black);
+      border: 1.5px solid var(--black);
+    }
+
+    .toggle-not-done:hover {
+      background: var(--gray-100);
+    }
+
+    .icon-action-cluster {
+      display: flex;
+      gap: 6px;
+    }
+
+    /* Bottom Floating Bulk Bar */
+    .bulk-panel {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: calc(100% - 32px);
+      max-width: 440px;
+      background: var(--black);
+      color: var(--white);
+      border-radius: var(--radius-full);
+      padding: 8px 16px;
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+      z-index: 80;
+    }
+
+    .bulk-panel.show { display: flex; }
+
+    /* Modal Sheet */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(2px);
+      z-index: 100;
+      display: none;
+      align-items: flex-end;
+      justify-content: center;
+    }
+
+    @media (min-width: 600px) {
+      .modal-backdrop {
+        align-items: center;
+        padding: 20px;
+      }
+    }
+
+    .modal-backdrop.show { display: flex; }
+
+    .modal-card {
+      background: var(--white);
+      width: 100%;
+      max-width: 480px;
+      border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+      padding: 20px 20px 28px;
+      box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.2);
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    @media (min-width: 600px) {
+      .modal-card {
+        border-radius: var(--radius-lg);
+      }
+    }
+
+    .modal-header-strip {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 14px;
+    }
+
+    .input-group {
+      margin-bottom: 12px;
+    }
+
+    .input-lbl {
+      display: block;
+      font-size: 0.7rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+
+    .custom-input {
+      width: 100%;
+      height: 40px;
+      padding: 0 10px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      border: 1px solid var(--gray-300);
+      border-radius: var(--radius-sm);
+      outline: none;
+      background: var(--white);
+      color: var(--black);
+    }
+
+    .custom-input:focus {
+      border-color: var(--black);
+    }
+
+    /* Minimal Toast */
+    .toast-pill {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: var(--black);
+      color: var(--white);
+      font-size: 0.78rem;
+      font-weight: 700;
+      padding: 9px 18px;
+      border-radius: var(--radius-full);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+      z-index: 200;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .toast-pill.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* Thermal Sticker Label Layout (Monochrome Print) */
+    @media print {
+      body * { visibility: hidden; }
+      #print-area, #print-area * { visibility: visible; }
+      #print-area {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+      }
+      .no-print { display: none !important; }
+    }
+
+    .sticker-card {
+      border: 2px solid #000;
+      padding: 12px 14px;
+      margin: 0 auto 16px;
+      background: #fff;
+      color: #000;
+      max-width: 480px;
+      page-break-inside: avoid;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top App Bar -->
+  <header class="top-bar no-print">
+    <div class="top-bar-inner">
+      <div class="brand-group">
+        <span class="brand-name">TDGB 2026</span>
+        <span class="brand-badge">CHECKLIST</span>
+        <span class="sync-indicator offline" id="syncStatusBadge" onclick="openSupabaseModal()" title="Status Koneksi Cloud">
+          ● LOKAL
+        </span>
+      </div>
+      <div class="top-actions">
+        <button class="btn btn-sm" onclick="exportToExcel()" title="Unduh Excel">
+          <svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          <span>Excel</span>
+        </button>
+        <button class="btn btn-ghost btn-sm" onclick="openMenuModal()" title="Menu">
+          <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/><circle cx="5" cy="12" r="1.5"/></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- App Main Content -->
+  <main class="app-container no-print">
+
+    <!-- KPI Summary Row -->
+    <div class="kpi-row">
+      <div class="kpi-item active" id="kpi-card-kirim" onclick="setMainTab('kirim')">
+        <div class="kpi-label">
+          <span>Dikirim</span>
+          <svg class="icon icon-sm" viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+        </div>
+        <div class="kpi-val" id="kpi-kirim-num">0</div>
+        <div class="kpi-meta-text">
+          <span id="kpi-kirim-done">0 selesai</span>
+          <span id="kpi-kirim-pending">0 belum</span>
+        </div>
+      </div>
+
+      <div class="kpi-item" id="kpi-card-ambil" onclick="setMainTab('ambil')">
+        <div class="kpi-label">
+          <span>Ambil Langsung</span>
+          <svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+        </div>
+        <div class="kpi-val" id="kpi-ambil-num">0</div>
+        <div class="kpi-meta-text">
+          <span id="kpi-ambil-done">0 selesai</span>
+          <span id="kpi-ambil-pending">0 belum</span>
+        </div>
+      </div>
+
+      <div class="kpi-item" id="kpi-card-pending" onclick="setMainTab('pending')">
+        <div class="kpi-label">
+          <span>Belum Lunas</span>
+          <svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        </div>
+        <div class="kpi-val" id="kpi-pending-num">0</div>
+        <div class="kpi-meta-text">
+          <span>Verifikasi</span>
+        </div>
+      </div>
+
+      <div class="kpi-item" id="kpi-card-semua_po" onclick="setMainTab('semua_po')">
+        <div class="kpi-label">
+          <span>Total PO</span>
+          <svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M20.38 3.46L16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z"/></svg>
+        </div>
+        <div class="kpi-val" id="kpi-po-num">0</div>
+        <div class="kpi-meta-text">
+          <span>Jersey</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Segmented Navigation Tab -->
+    <nav class="segment-bar">
+      <button class="segment-btn active" id="tab-kirim" onclick="setMainTab('kirim')">
+        <span>Perlu Dikirim</span>
+        <span class="segment-counter" id="cnt-kirim">0</span>
+      </button>
+      <button class="segment-btn" id="tab-ambil" onclick="setMainTab('ambil')">
+        <span>Ambil Langsung</span>
+        <span class="segment-counter" id="cnt-ambil">0</span>
+      </button>
+      <button class="segment-btn" id="tab-pending" onclick="setMainTab('pending')">
+        <span>Pending</span>
+        <span class="segment-counter" id="cnt-pending">0</span>
+      </button>
+      <button class="segment-btn" id="tab-semua_po" onclick="setMainTab('semua_po')">
+        <span>Semua PO</span>
+        <span class="segment-counter" id="cnt-semua_po">0</span>
+      </button>
+    </nav>
+
+    <!-- Filter & Search Toolbar -->
+    <div class="filter-panel">
+      <div class="search-box">
+        <svg class="icon icon-sm search-icon-pos" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" id="searchInput" class="search-input" placeholder="Cari nama, BIB, no reg, resi..." oninput="handleSearch()">
+      </div>
+
+      <div class="filter-chip-row">
+        <button class="chip-btn active" id="sub-all" onclick="setSubFilter('all')">Semua</button>
+        <button class="chip-btn" id="sub-belum" onclick="setSubFilter('belum')">Belum</button>
+        <button class="chip-btn" id="sub-sudah" onclick="setSubFilter('sudah')">Sudah</button>
+
+        <select id="filterUkuran" class="chip-select" onchange="renderCards()">
+          <option value="">Ukuran: Semua</option>
+          <option value="S">Size S</option>
+          <option value="M">Size M</option>
+          <option value="L">Size L</option>
+          <option value="XL">Size XL</option>
+          <option value="XXL">Size XXL</option>
+          <option value="3XL">Size 3XL</option>
+          <option value="4XL">Size 4XL</option>
+        </select>
+
+        <select id="filterBatch" class="chip-select" onchange="renderCards()">
+          <option value="">Batch: Semua</option>
+          <option value="Batch 1">Batch 1</option>
+          <option value="Batch 2">Batch 2</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Cards List -->
+    <div class="card-list" id="cardListContainer">
+      <!-- Data Generated Dynamically -->
+    </div>
+
+    <!-- Empty State -->
+    <div id="emptyNotice" style="display: none; text-align: center; padding: 40px 20px; color: var(--text-muted);">
+      <svg class="icon icon-lg" style="margin-bottom: 8px;" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <div style="font-weight: 700; color: var(--black);">Tidak Ada Data Ditemukan</div>
+      <div style="font-size: 0.75rem; margin-top: 4px;">Ubah filter atau bersihkan kolom pencarian.</div>
+      <button class="btn btn-sm" style="margin-top: 10px;" onclick="resetFilter()">Reset Filter</button>
+    </div>
+
+  </main>
+
+  <!-- Floating Bulk Bar -->
+  <div class="bulk-panel" id="bulkPanel">
+    <div style="font-size: 0.78rem; font-weight: 800; font-family: var(--font-mono);">
+      <span id="bulkCount">0</span> DIPILIH
+    </div>
+    <div style="display: flex; gap: 6px;">
+      <button class="btn btn-sm" style="background: white; color: black; border-color: white;" onclick="bulkMarkDone()">
+        Tandai Selesai
+      </button>
+      <button class="btn btn-sm" style="background: #222; color: white; border-color: #444;" onclick="printSelectedLabels()">
+        Stiker
+      </button>
+      <button class="btn-ghost" style="color: white; padding: 4px 8px;" onclick="clearSelection()">
+        ✕
+      </button>
+    </div>
+  </div>
+
+  <!-- Modal Update Resi & Pengiriman -->
+  <div class="modal-backdrop" id="editModal">
+    <div class="modal-card">
+      <div class="modal-header-strip">
+        <h3 style="font-size: 1rem; font-weight: 800;">Update Pengiriman</h3>
+        <button class="btn-ghost" onclick="closeEditModal()">
+          <svg class="icon" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+
+      <input type="hidden" id="editId">
+
+      <div style="background: var(--bg-subtle); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 10px 12px; margin-bottom: 14px;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <strong id="modalNama" style="font-size: 0.95rem;">-</strong>
+          <span class="bib-badge" id="modalBib">-</span>
+        </div>
+        <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 2px;" id="modalSpec">-</div>
+        <div style="font-size: 0.72rem; color: var(--text-subtle); margin-top: 6px;" id="modalAlamat">-</div>
+      </div>
+
+      <div class="input-group">
+        <label class="input-lbl">Status</label>
+        <select id="modalStatus" class="custom-input" onchange="handleModalStatusChange()">
+          <option value="Belum">Belum Diproses</option>
+          <option value="Sudah">Sudah Selesai</option>
+        </select>
+      </div>
+
+      <div id="shipFields">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+          <div class="input-group">
+            <label class="input-lbl">Kurir / Ekspedisi</label>
+            <select id="modalEkspedisi" class="custom-input">
+              <option value="">Pilih Kurir...</option>
+              <option value="JNE">JNE</option>
+              <option value="J&T">J&T Express</option>
+              <option value="SiCepat">SiCepat</option>
+              <option value="Anteraja">Anteraja</option>
+              <option value="Wahana">Wahana</option>
+              <option value="Pos Indonesia">Pos Indonesia</option>
+              <option value="GoSend">GoSend</option>
+              <option value="GrabExpress">GrabExpress</option>
+              <option value="Lainnya">Lainnya</option>
+            </select>
+          </div>
+          <div class="input-group">
+            <label class="input-lbl">Tanggal Kirim</label>
+            <input type="date" id="modalTanggalKirim" class="custom-input">
+          </div>
+        </div>
+
+        <div class="input-group">
+          <label class="input-lbl">Nomor Resi</label>
+          <input type="text" id="modalNoResi" class="custom-input" placeholder="Masukkan nomor resi..." style="font-family: var(--font-mono);">
+        </div>
+      </div>
+
+      <div class="input-group">
+        <label class="input-lbl">Catatan</label>
+        <input type="text" id="modalCatatan" class="custom-input" placeholder="Catatan logistik opsional...">
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 16px;">
+        <button class="btn" onclick="closeEditModal()">Batal</button>
+        <button class="btn btn-solid" onclick="saveEditModal()">Simpan</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Konfigurasi Supabase Cloud -->
+  <div class="modal-backdrop" id="supabaseModal">
+    <div class="modal-card">
+      <div class="modal-header-strip">
+        <h3 style="font-size: 1rem; font-weight: 800;">Koneksi Supabase Cloud</h3>
+        <button class="btn-ghost" onclick="closeSupabaseModal()">
+          <svg class="icon" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 12px; line-height: 1.4;">
+        Hubungkan ke database Supabase agar semua perangkat (Laptop, HP panitia) dapat saling sinkron secara realtime dari mana saja!
+      </div>
+
+      <div class="input-group">
+        <label class="input-lbl">Project URL</label>
+        <input type="text" id="supabaseUrlInput" class="custom-input" placeholder="https://xyz.supabase.co">
+      </div>
+
+      <div class="input-group">
+        <label class="input-lbl">Anon Public Key</label>
+        <input type="password" id="supabaseKeyInput" class="custom-input" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6...">
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 14px;">
+        <button class="btn" onclick="closeSupabaseModal()">Tutup</button>
+        <button class="btn btn-solid" onclick="saveSupabaseConfig()">Hubungkan Cloud</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Menu Modal: Backup / LAN Sync -->
+  <div class="modal-backdrop" id="menuModal">
+    <div class="modal-card">
+      <div class="modal-header-strip">
+        <h3 style="font-size: 1rem; font-weight: 800;">Menu & Pengaturan</h3>
+        <button class="btn-ghost" onclick="closeMenuModal()">
+          <svg class="icon" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 8px;">
+        <button class="btn" style="justify-content: flex-start; padding: 10px;" onclick="closeMenuModal(); openSupabaseModal();">
+          <svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/></svg>
+          <div style="text-align: left; margin-left: 6px;">
+            <div style="font-weight: 800;">Koneksi Supabase Cloud</div>
+            <div style="font-size: 0.7rem; color: var(--text-muted);">Sinkronisasi realtime lintas banyak perangkat</div>
+          </div>
+        </button>
+
+        <button class="btn" style="justify-content: flex-start; padding: 10px;" onclick="backupData()">
+          <svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          <span>Cadangkan Data (JSON)</span>
+        </button>
+
+        <button class="btn" style="justify-content: flex-start; padding: 10px;" onclick="resetToInitial()">
+          <svg class="icon icon-sm" viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+          <span>Reset ke Data Awal</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Print Area -->
+  <div id="print-area"></div>
+
+  <!-- Minimal Toast -->
+  <div id="toast" class="toast-pill">
+    <svg class="icon icon-sm" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+    <span id="toast-text">Tersimpan</span>
+  </div>
+
+  <script>
+    const STORAGE_KEY = 'TDGB_2026_CHECKLIST_MONO_V2';
+    const SUPABASE_STORAGE_URL_KEY = 'TDGB_2026_SUPABASE_URL';
+    const SUPABASE_STORAGE_KEY_KEY = 'TDGB_2026_SUPABASE_KEY';
+
+    let participants = [];
+    let currentMainTab = 'kirim'; // 'kirim', 'ambil', 'pending', 'semua_po'
+    let currentSubFilter = 'all';  // 'all', 'belum', 'sudah'
+    let searchQuery = '';
+    let selectedIds = new Set();
+    let supabaseClient = null;
+
+    // Inisialisasi Supabase
+    function initSupabase() {
+      const storedUrl = localStorage.getItem(SUPABASE_STORAGE_URL_KEY) || (window.SUPABASE_CONFIG && window.SUPABASE_CONFIG.url);
+      const storedKey = localStorage.getItem(SUPABASE_STORAGE_KEY_KEY) || (window.SUPABASE_CONFIG && window.SUPABASE_CONFIG.anonKey);
+
+      if (storedUrl && storedKey && typeof window.supabase !== 'undefined') {
+        try {
+          supabaseClient = window.supabase.createClient(storedUrl, storedKey);
+          updateSyncBadge(true);
+          setupRealtimeSubscription();
+          return true;
+        } catch (e) {
+          console.error('Inisialisasi Supabase gagal:', e);
+          updateSyncBadge(false);
+          return false;
+        }
+      }
+      updateSyncBadge(false);
+      return false;
+    }
+
+    function updateSyncBadge(isCloud) {
+      const el = document.getElementById('syncStatusBadge');
+      if (isCloud) {
+        el.className = 'sync-indicator online';
+        el.innerText = '● CLOUD REALTIME';
+      } else {
+        el.className = 'sync-indicator offline';
+        el.innerText = '○ LOKAL (KLIK SYNC)';
+      }
+    }
+
+    // Subscribe ke Realtime Supabase
+    function setupRealtimeSubscription() {
+      if (!supabaseClient) return;
+
+      supabaseClient
+        .channel('public:peserta')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'peserta' }, payload => {
+          if (payload.eventType === 'UPDATE') {
+            const updated = payload.new;
+            const idx = participants.findIndex(p => p.id === updated.id);
+            if (idx !== -1) {
+              participants[idx].statusKirim = updated.status_kirim;
+              participants[idx].ekspedisi = updated.ekspedisi;
+              participants[idx].noResi = updated.no_resi;
+              participants[idx].tanggalKirim = updated.tanggal_kirim;
+              participants[idx].catatan = updated.catatan;
+              localStorage.setItem(STORAGE_KEY, JSON.stringify(participants));
+              updateStats();
+              renderCards();
+              showToast(`Data ${updated.nama} diperbarui realtime`);
+            }
+          }
+        })
+        .subscribe();
+    }
+
+    // Load Data
+    async function loadData() {
+      const isCloudReady = initSupabase();
+
+      // Coba load dari Supabase jika terhubung
+      if (isCloudReady) {
+        try {
+          const { data, error } = await supabaseClient.from('peserta').select('*');
+          if (!error && data && data.length > 0) {
+            participants = data.map(d => ({
+              id: d.id,
+              bib: d.bib,
+              noReg: d.no_reg,
+              nama: d.nama,
+              komunitas: d.komunitas,
+              noTelp: d.no_telp,
+              noKerabat: d.no_kerabat,
+              alamatLengkap: d.alamat_lengkap,
+              jenisReg: d.jenis_reg,
+              isPO: d.is_po,
+              kategoriJersey: d.kategori_jersey,
+              jenisLengan: d.jenis_lengan,
+              ukuran: d.ukuran,
+              qty: d.qty,
+              metodeAmbil: d.metode_ambil,
+              alamatKirim: d.alamat_kirim,
+              batchProduksi: d.batch_produksi,
+              totalHarga: d.total_harga,
+              statusPembayaran: d.status_pembayaran,
+              isLunas: d.is_lunas,
+              verifikator: d.verifikator,
+              tanggalBayar: d.tanggal_bayar,
+              statusKirim: d.status_kirim || 'Belum',
+              ekspedisi: d.ekspedisi || '',
+              noResi: d.no_resi || '',
+              tanggalKirim: d.tanggal_kirim || '',
+              catatan: d.catatan || ''
+            }));
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(participants));
+            updateStats();
+            renderCards();
+            return;
+          }
+        } catch (err) {
+          console.warn('Fetch Supabase error:', err);
+        }
+      }
+
+      // Fallback ke LocalStorage / INITIAL_DATA
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        try {
+          participants = JSON.parse(saved);
+        } catch (e) {
+          participants = JSON.parse(JSON.stringify(window.INITIAL_DATA || []));
+        }
+      } else if (window.INITIAL_DATA) {
+        participants = JSON.parse(JSON.stringify(window.INITIAL_DATA));
+      } else {
+        participants = [];
+      }
+      updateStats();
+      renderCards();
+    }
+
+    // Save Data (Local + Cloud Sync)
+    async function saveData(singleItem = null) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(participants));
+      updateStats();
+      showToast('Tersimpan');
+
+      // Jika ada koneksi Supabase, sync update
+      if (supabaseClient) {
+        try {
+          if (singleItem) {
+            await supabaseClient.from('peserta').update({
+              status_kirim: singleItem.statusKirim,
+              ekspedisi: singleItem.ekspedisi,
+              no_resi: singleItem.noResi,
+              tanggal_kirim: singleItem.tanggalKirim,
+              catatan: singleItem.catatan
+            }).eq('id', singleItem.id);
+          } else {
+            // Bulk update payload jika ada
+          }
+        } catch (e) {
+          console.error('Gagal update ke Supabase:', e);
+        }
+      }
+    }
+
+    // Modal Supabase
+    function openSupabaseModal() {
+      document.getElementById('supabaseUrlInput').value = localStorage.getItem(SUPABASE_STORAGE_URL_KEY) || (window.SUPABASE_CONFIG && window.SUPABASE_CONFIG.url) || '';
+      document.getElementById('supabaseKeyInput').value = localStorage.getItem(SUPABASE_STORAGE_KEY_KEY) || (window.SUPABASE_CONFIG && window.SUPABASE_CONFIG.anonKey) || '';
+      document.getElementById('supabaseModal').classList.add('show');
+    }
+
+    function closeSupabaseModal() {
+      document.getElementById('supabaseModal').classList.remove('show');
+    }
+
+    function saveSupabaseConfig() {
+      const url = document.getElementById('supabaseUrlInput').value.trim();
+      const key = document.getElementById('supabaseKeyInput').value.trim();
+
+      if (!url || !key) {
+        alert('Harap masukkan Project URL dan Anon Key.');
+        return;
+      }
+
+      localStorage.setItem(SUPABASE_STORAGE_URL_KEY, url);
+      localStorage.setItem(SUPABASE_STORAGE_KEY_KEY, key);
+
+      closeSupabaseModal();
+      loadData();
+      showToast('Koneksi Supabase disimpan');
+    }
+
+    // Update KPI Counters
+    function updateStats() {
+      const poList = participants.filter(p => p.isPO);
+
+      const kirimList = poList.filter(p => p.metodeAmbil === 'dikirim');
+      const kirimDone = kirimList.filter(p => p.statusKirim === 'Sudah').length;
+      const kirimPending = kirimList.length - kirimDone;
+
+      const ambilList = poList.filter(p => p.metodeAmbil === 'ambil_langsung');
+      const ambilDone = ambilList.filter(p => p.statusKirim === 'Sudah').length;
+      const ambilPending = ambilList.length - ambilDone;
+
+      const pendingPay = poList.filter(p => !p.isLunas).length;
+
+      document.getElementById('kpi-kirim-num').innerText = kirimList.length;
+      document.getElementById('kpi-kirim-done').innerText = `${kirimDone} selesai`;
+      document.getElementById('kpi-kirim-pending').innerText = `${kirimPending} belum`;
+
+      document.getElementById('kpi-ambil-num').innerText = ambilList.length;
+      document.getElementById('kpi-ambil-done').innerText = `${ambilDone} selesai`;
+      document.getElementById('kpi-ambil-pending').innerText = `${ambilPending} belum`;
+
+      document.getElementById('kpi-pending-num').innerText = pendingPay;
+      document.getElementById('kpi-po-num').innerText = poList.length;
+
+      document.getElementById('cnt-kirim').innerText = kirimList.length;
+      document.getElementById('cnt-ambil').innerText = ambilList.length;
+      document.getElementById('cnt-pending').innerText = pendingPay;
+      document.getElementById('cnt-semua_po').innerText = poList.length;
+    }
+
+    function setMainTab(tab) {
+      currentMainTab = tab;
+      selectedIds.clear();
+      updateBulkPanel();
+
+      ['kirim', 'ambil', 'pending', 'semua_po'].forEach(t => {
+        const tabEl = document.getElementById(`tab-${t}`);
+        const cardEl = document.getElementById(`kpi-card-${t}`);
+        if (tabEl) tabEl.classList.toggle('active', t === tab);
+        if (cardEl) cardEl.classList.toggle('active', t === tab);
+      });
+
+      renderCards();
+    }
+
+    function setSubFilter(sub) {
+      currentSubFilter = sub;
+      ['all', 'belum', 'sudah'].forEach(s => {
+        const el = document.getElementById(`sub-${s}`);
+        if (el) el.classList.toggle('active', s === sub);
+      });
+      renderCards();
+    }
+
+    function handleSearch() {
+      searchQuery = document.getElementById('searchInput').value.trim().toLowerCase();
+      renderCards();
+    }
+
+    function resetFilter() {
+      document.getElementById('searchInput').value = '';
+      document.getElementById('filterUkuran').value = '';
+      document.getElementById('filterBatch').value = '';
+      searchQuery = '';
+      setSubFilter('all');
+    }
+
+    function getFilteredList() {
+      const ukuran = document.getElementById('filterUkuran').value;
+      const batch = document.getElementById('filterBatch').value;
+
+      return participants.filter(item => {
+        if (currentMainTab === 'kirim') {
+          if (!item.isPO || item.metodeAmbil !== 'dikirim') return false;
+        } else if (currentMainTab === 'ambil') {
+          if (!item.isPO || item.metodeAmbil !== 'ambil_langsung') return false;
+        } else if (currentMainTab === 'pending') {
+          if (!item.isPO || item.isLunas) return false;
+        } else if (currentMainTab === 'semua_po') {
+          if (!item.isPO) return false;
+        }
+
+        if (currentSubFilter === 'belum' && item.statusKirim === 'Sudah') return false;
+        if (currentSubFilter === 'sudah' && item.statusKirim !== 'Sudah') return false;
+
+        if (ukuran && item.ukuran !== ukuran) return false;
+        if (batch && item.batchProduksi !== batch) return false;
+
+        if (searchQuery) {
+          const q = `${item.bib} ${item.noReg} ${item.nama} ${item.komunitas} ${item.noTelp} ${item.noResi} ${item.alamatKirim || item.alamatLengkap}`.toLowerCase();
+          if (!q.includes(searchQuery)) return false;
+        }
+
+        return true;
+      });
+    }
+
+    function renderCards() {
+      const list = getFilteredList();
+      const container = document.getElementById('cardListContainer');
+      const emptyNotice = document.getElementById('emptyNotice');
+
+      if (list.length === 0) {
+        container.innerHTML = '';
+        emptyNotice.style.display = 'block';
+        return;
+      }
+      emptyNotice.style.display = 'none';
+
+      let html = '';
+      list.forEach(item => {
+        const isDone = item.statusKirim === 'Sudah';
+        const isChecked = selectedIds.has(item.id);
+        const isUnpaid = item.isPO && !item.isLunas;
+
+        // WA URL
+        let hpClean = (item.noTelp || '').replace(/[^0-9]/g, '');
+        if (hpClean.startsWith('0')) hpClean = '62' + hpClean.substring(1);
+        
+        let waText = '';
+        if (item.metodeAmbil === 'dikirim') {
+          if (isDone) {
+            waText = encodeURIComponent(`Halo Kak ${item.nama} (BIB: ${item.bib}), jersey Tour De Gunung Batu 2026 Anda (${item.ukuran}) SUDAH DIKIRIM via ${item.ekspedisi || 'Kurir'} (Resi: ${item.noResi || '-'}). Terima kasih.`);
+          } else {
+            waText = encodeURIComponent(`Halo Kak ${item.nama} (BIB: ${item.bib}), pesanan jersey Tour De Gunung Batu 2026 Anda sedang disiapkan untuk pengiriman ke alamat: ${item.alamatKirim}. Terima kasih.`);
+          }
+        } else {
+          waText = encodeURIComponent(`Halo Kak ${item.nama} (BIB: ${item.bib}), jersey Tour De Gunung Batu 2026 Anda (${item.ukuran}) siap diambil saat event. Terima kasih.`);
+        }
+        const waUrl = hpClean ? `https://wa.me/${hpClean}?text=${waText}` : '';
+
+        // Status Label
+        let btnText = '';
+        if (item.metodeAmbil === 'dikirim') {
+          btnText = isDone ? 'SUDAH DIKIRIM' : 'TANDAI DIKIRIM';
+        } else {
+          btnText = isDone ? 'SUDAH DIAMBIL' : 'TANDAI DIAMBIL';
+        }
+
+        html += `
+          <div class="participant-card ${isDone ? 'done' : ''} ${isUnpaid ? 'unpaid' : ''}">
+            <div class="card-header-line">
+              <div class="header-left">
+                <input type="checkbox" ${isChecked ? 'checked' : ''} onchange="toggleSelectCard('${item.id}', this.checked)" style="accent-color: #000; width: 16px; height: 16px; cursor: pointer;">
+                <span class="bib-badge">${item.bib ? '#' + item.bib : 'NO BIB'}</span>
+                <span class="reg-badge">${item.noReg}</span>
+                ${item.batchProduksi && item.batchProduksi !== '-' ? `<span class="batch-badge">${item.batchProduksi}</span>` : ''}
+              </div>
+              <div>
+                ${isUnpaid ? '<span class="unpaid-tag">BELUM LUNAS</span>' : ''}
+              </div>
+            </div>
+
+            <div class="card-name-title">${escapeHtml(item.nama)}</div>
+            <div class="card-sub-meta">${escapeHtml(item.komunitas || 'Personal')} &bull; ${escapeHtml(item.noTelp || '-')}</div>
+
+            ${item.isPO ? `
+              <div class="jersey-spec-row">
+                <span class="size-box">${escapeHtml(item.ukuran)}</span>
+                <span class="spec-desc">${escapeHtml(item.jenisLengan)}</span>
+                <span class="method-pill">${item.metodeAmbil === 'dikirim' ? 'KIRIM' : 'AMBIL DI TEMPAT'}</span>
+              </div>
+            ` : ''}
+
+            ${item.metodeAmbil === 'dikirim' ? `
+              <div class="address-text">
+                <strong>Alamat:</strong> ${escapeHtml(item.alamatKirim || item.alamatLengkap || '-')}
+              </div>
+            ` : ''}
+
+            ${item.metodeAmbil === 'dikirim' && (item.noResi || item.ekspedisi) ? `
+              <div class="resi-strip">
+                <div>
+                  <span style="font-size: 0.68rem; color: var(--text-subtle);">KURIR / RESI:</span>
+                  <div class="resi-code">${escapeHtml(item.ekspedisi || 'Kurir')} &bull; ${escapeHtml(item.noResi || '-')}</div>
+                </div>
+                <div style="font-size: 0.72rem; color: var(--text-muted); font-family: var(--font-mono);">
+                  ${item.tanggalKirim || ''}
+                </div>
+              </div>
+            ` : ''}
+
+            <div class="card-actions-bar">
+              <button class="status-toggle-thumb ${isDone ? 'toggle-done' : 'toggle-not-done'}" onclick="toggleStatus('${item.id}')">
+                ${isDone ? `
+                  <svg class="icon icon-sm" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                ` : `
+                  <svg class="icon icon-sm" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg>
+                `}
+                <span>${btnText}</span>
+              </button>
+
+              <div class="icon-action-cluster">
+                ${hpClean ? `
+                  <a href="${waUrl}" target="_blank" class="btn btn-icon-sq" title="WhatsApp">
+                    <svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+                  </a>
+                ` : ''}
+
+                <button class="btn btn-icon-sq" onclick="openEditModal('${item.id}')" title="Edit Resi">
+                  <svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                </button>
+
+                ${item.metodeAmbil === 'dikirim' ? `
+                  <button class="btn btn-icon-sq" onclick="printSingleLabel('${item.id}')" title="Cetak Stiker">
+                    <svg class="icon icon-sm" viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+                  </button>
+                ` : ''}
+              </div>
+            </div>
+          </div>
+        `;
+      });
+
+      container.innerHTML = html;
+    }
+
+    // Toggle 1-Click
+    function toggleStatus(id) {
+      const item = participants.find(p => p.id === id);
+      if (!item) return;
+
+      if (!item.isLunas) {
+        if (!confirm(`Perhatian: Status pembayaran ${item.nama} masih BELUM LUNAS.\n\nTetap tandai sebagai selesai?`)) {
+          return;
+        }
+      }
+
+      if (item.statusKirim === 'Sudah') {
+        item.statusKirim = 'Belum';
+        showToast('Ditandai Belum');
+      } else {
+        item.statusKirim = 'Sudah';
+        if (!item.tanggalKirim) {
+          item.tanggalKirim = new Date().toISOString().split('T')[0];
+        }
+        showToast('Ditandai Selesai');
+      }
+
+      saveData(item);
+      renderCards();
+    }
+
+    // Selection Handlers
+    function toggleSelectCard(id, checked) {
+      if (checked) {
+        selectedIds.add(id);
+      } else {
+        selectedIds.delete(id);
+      }
+      updateBulkPanel();
+    }
+
+    function clearSelection() {
+      selectedIds.clear();
+      updateBulkPanel();
+      renderCards();
+    }
+
+    function updateBulkPanel() {
+      const panel = document.getElementById('bulkPanel');
+      const countEl = document.getElementById('bulkCount');
+      if (selectedIds.size > 0) {
+        panel.classList.add('show');
+        countEl.innerText = selectedIds.size;
+      } else {
+        panel.classList.remove('show');
+      }
+    }
+
+    function bulkMarkDone() {
+      const today = new Date().toISOString().split('T')[0];
+      let count = 0;
+      participants.forEach(p => {
+        if (selectedIds.has(p.id) && p.isPO) {
+          p.statusKirim = 'Sudah';
+          if (!p.tanggalKirim) p.tanggalKirim = today;
+          count++;
+          if (supabaseClient) {
+            supabaseClient.from('peserta').update({
+              status_kirim: 'Sudah',
+              tanggal_kirim: today
+            }).eq('id', p.id);
+          }
+        }
+      });
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(participants));
+      updateStats();
+      renderCards();
+      clearSelection();
+      showToast(`${count} peserta ditandai selesai`);
+    }
+
+    // Edit Modal
+    function openEditModal(id) {
+      const item = participants.find(p => p.id === id);
+      if (!item) return;
+
+      document.getElementById('editId').value = item.id;
+      document.getElementById('modalNama').innerText = item.nama;
+      document.getElementById('modalBib').innerText = item.bib ? '#' + item.bib : item.noReg;
+      document.getElementById('modalSpec').innerText = `${item.ukuran} &bull; ${item.jenisLengan} &bull; ${item.batchProduksi || 'Batch 1'}`;
+      document.getElementById('modalAlamat').innerText = item.alamatKirim || item.alamatLengkap || '-';
+
+      document.getElementById('modalStatus').value = item.statusKirim || 'Belum';
+      document.getElementById('modalEkspedisi').value = item.ekspedisi || '';
+      document.getElementById('modalNoResi').value = item.noResi || '';
+      document.getElementById('modalTanggalKirim').value = item.tanggalKirim || (item.statusKirim === 'Sudah' ? new Date().toISOString().split('T')[0] : '');
+      document.getElementById('modalCatatan').value = item.catatan || '';
+
+      document.getElementById('shipFields').style.display = item.metodeAmbil === 'dikirim' ? 'block' : 'none';
+
+      document.getElementById('editModal').classList.add('show');
+    }
+
+    function closeEditModal() {
+      document.getElementById('editModal').classList.remove('show');
+    }
+
+    function handleModalStatusChange() {
+      const st = document.getElementById('modalStatus').value;
+      const tgl = document.getElementById('modalTanggalKirim');
+      if (st === 'Sudah' && !tgl.value) {
+        tgl.value = new Date().toISOString().split('T')[0];
+      }
+    }
+
+    function saveEditModal() {
+      const id = document.getElementById('editId').value;
+      const item = participants.find(p => p.id === id);
+      if (!item) return;
+
+      item.statusKirim = document.getElementById('modalStatus').value;
+      item.ekspedisi = document.getElementById('modalEkspedisi').value;
+      item.noResi = document.getElementById('modalNoResi').value.trim();
+      item.tanggalKirim = document.getElementById('modalTanggalKirim').value;
+      item.catatan = document.getElementById('modalCatatan').value.trim();
+
+      saveData(item);
+      closeEditModal();
+      renderCards();
+    }
+
+    // Print Thermal Labels
+    function printSingleLabel(id) {
+      const item = participants.find(p => p.id === id);
+      if (!item) return;
+      generatePrint([item]);
+    }
+
+    function printSelectedLabels() {
+      const list = participants.filter(p => selectedIds.has(p.id) && p.metodeAmbil === 'dikirim');
+      if (list.length === 0) {
+        alert('Pilih setidaknya 1 peserta dengan metode "dikirim".');
+        return;
+      }
+      generatePrint(list);
+    }
+
+    function generatePrint(items) {
+      const area = document.getElementById('print-area');
+      let html = `<div style="padding: 10px;">`;
+
+      items.forEach(item => {
+        html += `
+          <div class="sticker-card">
+            <div style="display: flex; justify-content: space-between; border-bottom: 2px solid #000; padding-bottom: 6px; margin-bottom: 8px;">
+              <div>
+                <strong style="font-size: 13px;">TDGB 2026 OFFICIAL JERSEY</strong>
+                <div style="font-size: 10px; color: #444;">Tour De Gunung Batu</div>
+              </div>
+              <div style="text-align: right;">
+                <strong style="font-size: 14px; font-family: monospace;">BIB #${item.bib || '-'}</strong>
+                <div style="font-size: 10px; font-family: monospace;">${item.noReg}</div>
+              </div>
+            </div>
+
+            <div style="margin-bottom: 8px;">
+              <div style="font-size: 9px; font-weight: bold; text-transform: uppercase;">PENERIMA:</div>
+              <div style="font-size: 14px; font-weight: 900;">${escapeHtml(item.nama)}</div>
+              <div style="font-size: 11px; font-weight: bold;">TELP: ${escapeHtml(item.noTelp || '-')}</div>
+            </div>
+
+            <div style="border: 1px solid #000; padding: 6px; margin-bottom: 8px; font-size: 11px; line-height: 1.35;">
+              <div style="font-size: 9px; font-weight: bold;">ALAMAT TUJUAN:</div>
+              ${escapeHtml(item.alamatKirim || item.alamatLengkap || '-')}
+            </div>
+
+            <div style="display: flex; justify-content: space-between; border-top: 1px dashed #000; padding-top: 6px; font-size: 11px;">
+              <div><strong>PAKET:</strong> Size ${escapeHtml(item.ukuran)} (${escapeHtml(item.jenisLengan)})</div>
+              <div>Qty: <strong>${item.qty} pcs</strong></div>
+            </div>
+
+            ${item.noResi ? `
+              <div style="margin-top: 6px; font-size: 11px; font-family: monospace; font-weight: bold;">
+                KURIR: ${escapeHtml(item.ekspedisi || 'Kurir')} &bull; RESI: ${escapeHtml(item.noResi)}
+              </div>
+            ` : ''}
+          </div>
+        `;
+      });
+
+      html += '</div>';
+      area.innerHTML = html;
+      window.print();
+    }
+
+    // Export to Excel
+    function exportToExcel() {
+      if (typeof XLSX === 'undefined') {
+        alert('Library Excel belum dimuat.');
+        return;
+      }
+
+      showToast('Membuat file Excel...');
+      const rows = participants.map((item, idx) => ({
+        'No': idx + 1,
+        'BIB': item.bib,
+        'No. Registrasi': item.noReg,
+        'Nama Lengkap': item.nama,
+        'Komunitas': item.komunitas,
+        'No. Telepon': item.noTelp,
+        'Ukuran': item.ukuran,
+        'Lengan': item.jenisLengan,
+        'Metode Ambil': item.metodeAmbil,
+        'Alamat Pengiriman': item.alamatKirim,
+        'Batch': item.batchProduksi,
+        'Status Bayar': item.statusPembayaran,
+        'STATUS CHECKLIST': item.isPO ? (item.statusKirim === 'Sudah' ? 'SUDAH' : 'BELUM') : 'NON-PO',
+        'EKSPEDISI': item.ekspedisi,
+        'NO. RESI': item.noResi,
+        'TANGGAL KIRIM': item.tanggalKirim,
+        'CATATAN': item.catatan
+      }));
+
+      const ws = XLSX.utils.json_to_sheet(rows);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, 'Checklist PO Jersey');
+
+      const date = new Date().toISOString().split('T')[0];
+      XLSX.writeFile(wb, `Checklist_Jersey_TDGB2026_${date}.xlsx`);
+    }
+
+    // Menu Modal
+    function openMenuModal() {
+      document.getElementById('menuModal').classList.add('show');
+    }
+    function closeMenuModal() {
+      document.getElementById('menuModal').classList.remove('show');
+    }
+
+    function backupData() {
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(participants, null, 2));
+      const a = document.createElement('a');
+      const date = new Date().toISOString().split('T')[0];
+      a.setAttribute("href", dataStr);
+      a.setAttribute("download", `Backup_TDGB2026_${date}.json`);
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      closeMenuModal();
+    }
+
+    function resetToInitial() {
+      if (confirm('Kembalikan semua status checklist ke awal?')) {
+        localStorage.removeItem(STORAGE_KEY);
+        participants = JSON.parse(JSON.stringify(window.INITIAL_DATA || []));
+        saveData();
+        renderCards();
+        closeMenuModal();
+      }
+    }
+
+    function showToast(text) {
+      const toast = document.getElementById('toast');
+      document.getElementById('toast-text').innerText = text;
+      toast.classList.add('show');
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 1800);
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      loadData();
+    });
+  </script>
+</body>
+</html>
